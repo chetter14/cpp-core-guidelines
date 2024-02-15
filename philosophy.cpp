@@ -121,3 +121,26 @@ void foo()
 }
 
 
+// 8. Do not leak resources
+
+// Bad example
+void foo(char* name)
+{
+	FILE* f = fopen(name, "r");
+	// ...
+	if (something) return; 		// memory leak
+	// ...
+	fclose(f);
+}
+
+// Good example
+void foo(char* name)
+{
+	std::ifstream f {name};
+	// ...
+	if (something) return; 		// No memory leak
+	// ...
+}
+
+
+
