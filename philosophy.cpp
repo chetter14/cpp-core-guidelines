@@ -56,6 +56,68 @@ for (const auto& x : v)
 std::for_each(v.begin(), v.end(), [](int x) { /* do something with value of x */ } );
 
 
+// 5. Prefer compile-time checking to run-time
 
+static_assert(sizeof(int) >= 4);		// compile-time check of integer type size
+
+// Bad one
+void read(int* p, int n);
+
+int a[100];
+read(a, 100);
+
+// Good one
+void read(std::span<int> p);
+
+int a[100];
+read(a);			// using std::span<int> we let the compiler decide the size of the 'a' array
+
+
+// 6. If it cannot be checked at compile-time, make it checkable at run-time
+
+extern void foo(std::vector<int>&);
+extern void foo(std::span<int>);
+
+void boo(int n)
+{
+	std::vector v(n);
+	foo(v);							// we pass elements and number of them as one object
+	foo(std::span<int>{v});
+}
+
+
+// 7. Catch run-time errors as early as possible
+
+// Bad example
+
+void increment(int* p, int n)
+{
+	for (int i = 0; i < n; ++i) ++p[i];
+}
+
+void foo()
+{
+	const int n = 10;
+	int a[n] = { /* ... */ };
+	// ...
+	increment(a, m);		// made a typo, and will get an error in increment() function
+	// ...
+}
+
+// Good example
+
+void increment(std::span<int> p)
+{
+	for (auto& x : p) ++x;
+}
+
+void foo()
+{
+	const int n = 10;
+	int a[n] = { /* ... */ };
+	// ...
+	increment(a);		// no need in number of elements to be passed
+	// ...
+}
 
 
