@@ -57,3 +57,17 @@ OutputIterator merge(InputIterator1 first1, InputIterator1 last1,
 // put first and last iterators into one structure, compare by "<"
 template<class InputRange1, class InputRange2, class OutputIterator>
 OutputIterator merge(InputRange1 r1, InputRange2 r2, OutputIterator result);
+
+// 25. Prefer empty abstract classes as interfaces 
+
+// Good
+class Shape 
+{
+public:
+	virtual Point center() const = 0;
+	virtual void draw() const = 0;
+	virtual void rotate() = 0;
+	// ...
+	virtual ~Shape() = default;
+};
+
