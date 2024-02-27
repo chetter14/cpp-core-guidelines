@@ -99,3 +99,30 @@ std::pair<LargeObject, LargeObject> f(const std::string& input)
 	// ...
 	return { g(input), h(input) };	// no copies, no moves
 }
+
+// 26. Use unique_ptr<T> to transfer ownership 
+
+std::unique_ptr<Shape> get_shape(std::istream& in)
+{
+	auto kind = read_header(in);
+	switch (kind)
+	{
+		case kCircle:
+			return std::make_unique<Circle>(in);
+		case kTriangle:
+			return std::make_unique<Triangle>(in);
+		// ...
+	}
+}
+
+// 27. Use shared_ptr<T> to share ownership
+
+// ...
+std::shared_ptr<const Image> im { /* ... */ };
+
+std::thread t0 { /* ... */ , im };
+std::thread t1 { /* ... */ , im };
+std::thread t2 { /* ... */ , im };
+std::thread t3 { /* ... */ , im };
+
+// the last thread safely deletes the shared_ptr
