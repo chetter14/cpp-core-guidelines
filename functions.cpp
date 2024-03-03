@@ -126,3 +126,81 @@ std::thread t2 { /* ... */ , im };
 std::thread t3 { /* ... */ , im };
 
 // the last thread safely deletes the shared_ptr
+
+// 44. Return T& when no copy is desirable and to ensure that no nullptr is returned
+
+void use()
+{
+	Car c;
+	wheel& w0 = c.get_wheel(0);		// w0 has the same lifetime as c
+}
+
+// 45. Do not return T&&
+
+template<class F>
+auto&& wrapper(F f)
+{
+	// ...
+	return f();		// BAD: returns a reference to temporary object
+}
+
+template<class F>
+auto wrapper(F f)
+{
+	// ...
+	return f();		// OK
+}
+
+// 47. Return T& from assignment operator
+
+class Foo
+{
+public:
+	// ...
+	Foo& operator=(const Foo& rhs)
+	{
+		// Copy members
+		return *this;
+	}
+	// ...
+};
+
+// 49. Don't return const T
+
+const std::vector<int> boo();
+
+void foo(std::vector<int>& vx)
+{
+	vx = boo();		// move semantics are suppressed by const
+}
+
+// 55.
+
+template<class... Args>
+auto sum(Args... args)
+{
+	return (args + ...);	// C++ 17 - fold expression
+}
+
+// 56. Avoid unnecessary condition nesting
+
+// BAD
+void foo()
+{
+	if (x)
+	{
+		if (y) 
+		{
+			doSomething(x, y);
+		}
+	}
+}
+
+// GOOD
+void foo()
+{
+	if (!(x && y))
+		return;
+	
+	doSomething(x, y);
+}
