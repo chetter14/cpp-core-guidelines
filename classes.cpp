@@ -161,4 +161,63 @@ class Foo
 public:
 	Foo& operator=(const Foo& f);	// non-virtual because derived class copy assignment would have a different signature 
 	// so there is no point in making it virtual
+	Foo& operator=(Foo&& f);
 };
+
+// 66. Make move operations noexcept
+
+template<typename T>
+class Vector
+{
+public:
+	Vector(Vector&& a) noexcept : elem{ a.elem }, size{ a.size } { a.elem = nullptr; a.size = 0; }
+	Vector& operator=(Vector&& a) noexcept
+	{
+		if (&a != this)
+		{
+			delete elem;
+			this->elem = a.elem; a.elem = nullptr;
+			this->size = a.size; a.size = 0;
+		}
+		return *this;
+	}	
+	
+private:
+	T* elem;
+	int size;
+};
+
+// 67. A polymorphic class should suppress public copy/move
+
+// BAD
+class B
+{
+public:
+	virtual void m() { std::cout << "B\n"; }
+	// ... default copy operations
+};
+
+class D : public B
+{
+public:
+	void m() override { std::cout << "D\n"; }
+	// ...
+};
+
+void f(B& b)
+{
+	auto x = b;			// !!! slices the object, x.m() will print "B"
+}
+
+D d;
+f(d);
+
+// OK
+class B
+{
+public:
+	virtual void m() { std::cout << "B\n"; }
+	B(const B&) = delete;				// no slicing will happen
+	B& operator=(const B&) = delete;
+};
+
