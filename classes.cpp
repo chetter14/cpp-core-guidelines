@@ -117,7 +117,7 @@ public:
 String s = 10;					// BAD
 String s { 10 };				// GOOD
 
-// 47. Prefer default member initilizers to member initialization in constructors
+// 48. Prefer default member initilizers to member initialization in constructors
 
 // BAD
 class X
@@ -141,3 +141,24 @@ public:
 	X(int ii) : i{ ii } { }			// s and j are initialized as well
 };
 
+// 53. Inherit base class constructors and use them in derived class (with no modifications)
+
+class Rec
+{
+	// ... data and lots of constructors ...
+};
+
+class Oper : public Rec
+{
+	using Rec::Rec;
+	// ... data and utility funcitions ...
+};
+
+// 60. Make copy assignment non-virtual, parameter - const T& and return T&
+
+class Foo
+{
+public:
+	Foo& operator=(const Foo& f);	// non-virtual because derived class copy assignment would have a different signature 
+	// so there is no point in making it virtual
+};
